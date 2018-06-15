@@ -1,7 +1,6 @@
 package me.ichengzi.experiment.compiler;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Coding is pretty charming when you love it!
@@ -18,23 +17,23 @@ public class Parser {
 
     private List errorList ;
     private List<Token> tokenList;
-
     private int lineCount = 1;
     private Token current;
+    private Set<Token> identySet=new HashSet<>();//存放变量表
 
 
     public Parser(List<Token> tokenList) {
         this.tokenList = tokenList;
     }
 
+    //获取下一个字符
     private void next(){
-        current = tokenList.remove(0);
+        current = tokenList.remove(0);//删除的同时返回被删除的元素
         while (current.getTokenKind()== Token.TokenKind.EOLN){
             lineCount++;
             current = tokenList.remove(0);
         }
     }
-
 
     /**
      * 用于判断多个候选式的时候向前预测
@@ -62,26 +61,32 @@ public class Parser {
         return peek(0);
     }
 
+    //开始
     public void parse(){
         program();
     }
 
-
-
+    //开始判断文法
     private void program(){
         next();
-        if (current.getTokenKind().equals(Token.TokenKind.PROGRAM)){
-            next();
+        //程序->PROGRAM<标识符>;<分程序>
+        if (current.getTokenKind().equals(Token.TokenKind.PROGRAM)){//program
+            next();//标识符
             if (current.getTokenKind().equals(Token.TokenKind.IDENTIFIER)){
-                next();
+                next();//;
                 if (current.getTokenKind().equals(Token.TokenKind.SEMI)){
+                    //分程序-><变量说明>BEGIN<语句表>END
                     next();
-                    declarationTable();
+                    //如果存在着变量说明
+                    if (current.getTokenKind()==Token.TokenKind.VAR){
+                        //变量说明表
+                        declarationTable();
+                    }
+                    //BEGIN<语句表>END
+                    subProbgram();
                 }else {
                     error("此处需要一个标识符");
                 }
-                //executeTable();
-//                System.out.println("执行完executeTable之后:"+current);
                 next();
             }else{
                 error("此处需要一个分号");
@@ -89,11 +94,10 @@ public class Parser {
         }else{
                 error("程序缺少PROGRAM关键字");
         }
-        subProbgram();
+
     }
 
     private void subProbgram(){
-        next();
         if (current.getTokenKind().equals(Token.TokenKind.BEGIN)){
             declarationTable();
             next();
@@ -114,17 +118,26 @@ public class Parser {
         }
     }
 
+    //默认只处理Integer变量类型
     private void declarationTable(){
-        declarationStatement();
-        declarationTable2();
+        //变量表
+        declarationStatement();//一直读取到 : 结束
+        //多个变量表
+        declarationTable2();//处理 :Integer
     }
 
-    //识别
+    // :INTEGER;
     private void declarationTable2(){
+        next();
         Token token = peek();
         Token token1 = peek(1);
-        if (token.getTokenKind() == Token.TokenKind.SEMI && token1.getTokenKind() == Token.TokenKind.INTEGER){
+        //INTEGER;    结尾
+        if (token.getTokenKind() == Token.TokenKind.SEMI && current.getTokenKind() == Token.TokenKind.INTEGER){
             next();
+            //如果变量表结束了 使用$符号判断结束标记
+            if (current.getTokenKind()==Token.TokenKind.DOLLAR){
+                return;
+            }
             declarationStatement();
             declarationTable2();
         }else{
@@ -132,42 +145,42 @@ public class Parser {
         }
     }
 
+    /**
+     * 第一次进来current为VAR
+     * 读取变量说明
+     */
     private void declarationStatement(){
-        Token token = peek();//获取第当前位置字符
-//        printTokenList();
-        if (token.getTokenKind()== Token.TokenKind.VAR){
-            Token token1 = peek(1);//下一个
-            if (token1.getTokenKind() == Token.TokenKind.IDENTIFIER){
-                functionDeclaration();
-            }else{
+        Token token = peek();//获取下一个字符 ，还保存在list中没有remove
+        if (token.getTokenKind()!= Token.TokenKind.COLON){//不等于： 一直读取变量
+            if (token.getTokenKind() == Token.TokenKind.IDENTIFIER){
                 variableDeclaration();
+                next();
+                if (current.getTokenKind()==Token.TokenKind.COMMA){
+                    declarationStatement();//如果后面是分号说明还有变量
+                }else{
+                    return;
+                }
+            }else{
+                error("此处应该读取一个变量");
             }
         }else{
-
-//            System.out.println("token:"+token.getSymbol()+",tokenKind:"+token.getTokenKind());
-//            error("声明语句的开头应该是integer");
-            // $ ,这里默认应该是声明语句表和执行语句表的分解符
         }
     }
 
     private void variableDeclaration(){
-        next();//因为在declarationStatement方法中判定已经是integer了
+        next();//获取一个变量
         variable();
     }
 
     private void variable(){
-        identifier();
-    }
-
-    private void identifier(){
-        next();
         if (current.getTokenKind() == Token.TokenKind.IDENTIFIER){
+            identySet.add(current);
         }else{
             error("此处应该是标识符");
         }
     }
 
-
+    //  匹配（）
     private void functionDeclaration(){
         next();
         next();

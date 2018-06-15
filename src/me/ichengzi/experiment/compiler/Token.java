@@ -80,7 +80,9 @@ public class Token {
         POIT(".",25),
         EOLN("EOLN",26),
         EOF("EOF",27),
-        VAR("VAR",28);
+        COLON(":",28),
+        DOLLAR("$",29),
+        VAR("VAR",30);
         public final String name;
         public final int no;
         TokenKind(String name, int no) {
