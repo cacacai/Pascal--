@@ -16,6 +16,6 @@ BEGIN
  ELSE
   BEGIN
    A :=2* 2 *4 ;
-   B := 300  ;
+   B := 300 ;
   END
-END.
+  END.

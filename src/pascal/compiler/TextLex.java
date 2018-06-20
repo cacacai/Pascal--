@@ -90,10 +90,9 @@ public class TextLex {
 			s = ""+ch;
 			switch (ch) {
 			case ' ':
-			case '\n':
-				tokenList.add(new Token(s, Token.TokenKind.EOLN));
-				return ++i;
 			case '\r':
+			case '\n':
+				return ++i;
 			case '\t':
 				return ++i;
             case '(':

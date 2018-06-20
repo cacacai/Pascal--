@@ -99,6 +99,7 @@ public class Parser {
             //语句表
             next();
             statementTable();
+            //next();
             Token token=peek();
             //END.
             if (current.getTokenKind() == Token.TokenKind.END&&token.getTokenKind()==Token.TokenKind.POIT){
