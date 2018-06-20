@@ -1,22 +1,21 @@
- PROGRAM source;
- {This program is used to calculate the sum of all numbers from 1 to 10 }
- VAR A,B,C,MC,A99C,A22,D2C1:INTEGER;
- BEGIN
-	A :=20;
-		A99C:= 300;
-	B:=A;
-	IF A99C	<=B THEN		
-		A22 :=A+ B3 
-	ELSE
-		C := (	(2 +A) * c+ 2)* 	B ;
-	D2C1 :=C +100	;
-	MC:=1 	 ;
-	IF	10 >=B	THEN
-			WHILE MC < 5 DO	
-			  MC := MC + 1
-	 ELSE
-		IF B = C THEN	
-			C:=(C*A)+4
-		ELSE 
-			A:= 0
- END{.}	
+PROGRAM Passed1;
+VAR A,B,B3Y,C12A1,DD : INTEGER;
+BEGIN 
+  A:= 300 ;
+ B3Y :=100 ;
+ IF A> B3Y  THEN 
+   A:=A+ B3Y ;
+ ELSE   
+  C12A1 :=  2 * A ;
+ DD := C12A1 + 100 ;
+   IF 2< B THEN 
+  IF  DD<> C12A1 THEN
+   C12A1 := C12A1 +C12A1* 4 ;
+  ELSE  
+   A := 0 ;
+ ELSE
+  BEGIN
+   A :=2* 2 *4 ;
+   B := 300  ;
+  END
+END.

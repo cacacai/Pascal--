@@ -1,4 +1,4 @@
-package me.ichengzi.experiment.compiler;
+package pascal.compiler;
 
 /**
  * Coding is pretty charming when you love it!
@@ -56,7 +56,8 @@ public class Token {
         PROGRAM("PROGRAM",0),
         BEGIN("BEGIN",1),
         END("END",2),
-        INTEGER("INT",4),
+        INTEGER("INTEGER",3),
+        INT("INT",4),
         WHILE("WHILE",5),
         IF("IF",6),
         THEN("THEN",7),
@@ -81,7 +82,7 @@ public class Token {
         EOLN("EOLN",26),
         EOF("EOF",27),
         COLON(":",28),
-        DOLLAR("$",29),
+        DIV("/",29),
         VAR("VAR",30);
         public final String name;
         public final int no;

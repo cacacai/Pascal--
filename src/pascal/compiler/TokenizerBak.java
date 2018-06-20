@@ -1,4 +1,4 @@
-package me.ichengzi.experiment.compiler;
+package pascal.compiler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  * @date 2017/4/26
  * @time 20:16
  */
-public class Tokenizer {
+public class TokenizerBak {
 
 
     private CharReader reader;
@@ -21,7 +21,7 @@ public class Tokenizer {
     private List<Token> tokenList = new ArrayList<>();
     private List<Error> errorList = new ArrayList<>();
 
-    public Tokenizer(CharReader reader) {
+    public TokenizerBak(CharReader reader) {
         this.reader = reader;
     }
 

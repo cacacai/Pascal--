@@ -1,4 +1,4 @@
-package me.ichengzi.experiment.compiler;
+package pascal.compiler;
 
 import java.util.*;
 
@@ -55,16 +55,15 @@ public class TextLex {
 			if(c==' '||c=='\t')
 				i++;
 			else if (c=='\r'||c=='\n') {//回车/换行
+				//tokenList.add(new Token(c+"", Token.TokenKind.EOLN));
 				row_number++;
 				i++;
 			}
 			else 
 				i=scannerPart(i);
 		}
-        //printIdenty(identifierList);
-        //System.out.println((Object) identifierList);
+		tokenList.add(new Token("EOF", Token.TokenKind.EOF));
         if (errorList.isEmpty()){
-            tokenList.add(new Token("EOF", Token.TokenKind.EOF));
             return true;
         }else{
             return false;
@@ -92,6 +91,8 @@ public class TextLex {
 			switch (ch) {
 			case ' ':
 			case '\n':
+				tokenList.add(new Token(s, Token.TokenKind.EOLN));
+				return ++i;
 			case '\r':
 			case '\t':
 				return ++i;
@@ -111,7 +112,7 @@ public class TextLex {
                     tokenList.add(new Token(s,Token.TokenKind.ASSIGNMENT));
 					return i+2;
 				}else {
-                    error(":不能识别");
+					tokenList.add(new Token(s,Token.TokenKind.COLON));
                     return i+1;
                 }
 			case ',':
@@ -170,6 +171,8 @@ public class TextLex {
                 tokenList.add(new Token(s, Token.TokenKind.INTEGER)); break;
             case "IF":
                 tokenList.add(new Token(s, Token.TokenKind.IF)); break;
+			case "ELSE":
+				tokenList.add(new Token(s, Token.TokenKind.ELSE)); break;
             case "THEN":
                 tokenList.add(new Token(s, Token.TokenKind.THEN)); break;
             case "VAR":
@@ -199,15 +202,15 @@ public class TextLex {
 		}
         if((text.charAt(i)==' ')||(text.charAt(i)=='\t')||(text.charAt(i)=='\n')||(text.charAt(i)=='\r')||(text.charAt(i)=='\0')||(isKey(text.charAt(i)+"")>0)){
 			// 到了结尾，输出数字
-            tokenList.add(new Token(s, Token.TokenKind.INTEGER));
+            tokenList.add(new Token(s, Token.TokenKind.INT));
 			return i;
 		}
 		else if (ch=='+'||ch=='-'||ch=='*'||ch=='/'||ch=='\0') {
-            tokenList.add(new Token(s, Token.TokenKind.INTEGER));
+            tokenList.add(new Token(s, Token.TokenKind.INT));
 			return i;
 		}
 		else if (ch=='+'||ch=='-'||ch=='*'||ch=='/'||ch=='\0') {
-            tokenList.add(new Token(s, Token.TokenKind.INTEGER));
+            tokenList.add(new Token(s, Token.TokenKind.INT));
 			return i;
 		}
 		else {
@@ -229,6 +232,7 @@ public class TextLex {
 		while (ch!='}') {
 			s = s+ch;
 			if (ch=='\r'||ch=='\n') {
+				tokenList.add(new Token(s, Token.TokenKind.EOLN));
 				row_number++;
 			}
 			else if (ch=='\0') {

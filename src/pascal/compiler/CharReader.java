@@ -1,4 +1,4 @@
-package me.ichengzi.experiment.compiler;
+package pascal.compiler;
 
 /**
  * Coding is pretty charming when you love it!

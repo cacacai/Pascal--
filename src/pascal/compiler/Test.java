@@ -1,4 +1,4 @@
-package me.ichengzi.experiment.compiler;
+package pascal.compiler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
