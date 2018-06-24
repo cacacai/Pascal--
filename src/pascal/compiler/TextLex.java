@@ -55,7 +55,7 @@ public class TextLex {
 			if(c==' '||c=='\t')
 				i++;
 			else if (c=='\r'||c=='\n') {//回车/换行
-				//tokenList.add(new Token(c+"", Token.TokenKind.EOLN));
+				tokenList.add(new Token(c+"", Token.TokenKind.EOLN));
 				row_number++;
 				i++;
 			}
@@ -92,6 +92,7 @@ public class TextLex {
 			case ' ':
 			case '\r':
 			case '\n':
+				tokenList.add(new Token(s+"", Token.TokenKind.EOLN));
 				return ++i;
 			case '\t':
 				return ++i;
@@ -175,7 +176,11 @@ public class TextLex {
             case "THEN":
                 tokenList.add(new Token(s, Token.TokenKind.THEN)); break;
             case "VAR":
-                tokenList.add(new Token(s, Token.TokenKind.VAR));
+                tokenList.add(new Token(s, Token.TokenKind.VAR));break;
+            case "WHILE":
+                tokenList.add(new Token(s, Token.TokenKind.WHILE));break;
+            case "DO":
+                tokenList.add(new Token(s, Token.TokenKind.DO));
                 break;
                 default:
                     if (!identifierList.containsKey(s)){
@@ -199,7 +204,7 @@ public class TextLex {
 			s = s+ch;
 			ch = text.charAt(++i);
 		}
-        if((text.charAt(i)==' ')||(text.charAt(i)=='\t')||(text.charAt(i)=='\n')||(text.charAt(i)=='\r')||(text.charAt(i)=='\0')||(isKey(text.charAt(i)+"")>0)){
+        if((text.charAt(i)==' ')||(text.charAt(i)==')')||(text.charAt(i)=='\t')||(text.charAt(i)=='\n')||(text.charAt(i)=='\r')||(text.charAt(i)=='\0')||(text.charAt(i)==';')||(isKey(text.charAt(i)+"")>0)){
 			// 到了结尾，输出数字
             tokenList.add(new Token(s, Token.TokenKind.INT));
 			return i;

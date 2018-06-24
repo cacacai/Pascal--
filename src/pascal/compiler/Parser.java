@@ -12,6 +12,7 @@ public class Parser {
     private List<Token> tokenList;
     private int lineCount = 1;
     private Token current;
+    private int endFlag=0;
 
 
     public Parser(List<Token> tokenList) {
@@ -116,12 +117,17 @@ public class Parser {
     private void statementTable(){
         //语句
         statement();
-        if (current.getTokenKind()==Token.TokenKind.SEMI){
-            next();
+        if (current.getTokenKind()==Token.TokenKind.SEMI||endFlag==1){
+            if (endFlag!=1){
+                next();
+            }
+
+            endFlag=0;
             statementTable();
         }else if (current.getTokenKind()==Token.TokenKind.END){
             return;
         }else {
+
             error("ERROR：缺少“;”！违背产生式：<语句表>-><语句>|<语句>;<语句表>");
             System.exit(0);
         }
@@ -139,9 +145,15 @@ public class Parser {
             complexStatement();
         }else if (current.getTokenKind()==Token.TokenKind.SEMI||current.getTokenKind()==Token.TokenKind.END){
             return;
+        }else if (current.getTokenKind()==Token.TokenKind.EOLN){
+            lineCount++;
         }else{
+            if (current.getTokenKind()==Token.TokenKind.EOF){
+                error("ERROR： 代码结束");
+                System.exit(0);
+            }
             error("ERROR：非法的语句");
-
+            System.exit(0);
         }
     }
 
@@ -192,7 +204,7 @@ public class Parser {
         conditionExpression();
         if (current.getTokenKind()==Token.TokenKind.DO){
             next();
-            conditionExpression();
+            statement();
         }else {
             error("ERROR：关系表达式后缺少“DO”!违背产生式：<While语句>->WHILE<关系表达式>DO<语句>");
         }
@@ -205,6 +217,7 @@ public class Parser {
         statementTable();
         if (current.getTokenKind()==Token.TokenKind.END){
             next();
+            endFlag=1;
         }else{
             error("ERROR：缺少“END”!\\t违背产生式：<复合语句>->BEGIN<语句表>END");
             return;
@@ -305,10 +318,10 @@ public class Parser {
         if (temp==Token.TokenKind.MUL||temp==Token.TokenKind.DIV){
             next();
             item();
-        }else if (temp==Token.TokenKind.INT){
-            error("ERROR：缺少算符！\\t违背产生式：<项>-><因式>|<项>*<因式>|<项>/<因式>");
+        }/*else if (temp==Token.TokenKind.INT){
+            error("ERROR：缺少算符！违背产生式：<项>-><因式>|<项>*<因式>|<项>/<因式>");
             return;
-        }
+        }*/
     }
 
     //因式->变量|常数|（算术表达式）
@@ -336,9 +349,9 @@ public class Parser {
         //算术表达式
         arithmeticExpression();
         //关系符
-        if (current.getTokenKind()==Token.TokenKind.THEN){
+        /*if (current.getTokenKind()==Token.TokenKind.THEN){
             return;
-        }
+        }*/
         relationOperator();
         //算术表达式
         if (current.getTokenKind()==Token.TokenKind.INT||current.getTokenKind()==Token.TokenKind.IDENTIFIER){

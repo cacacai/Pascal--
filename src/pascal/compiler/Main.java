@@ -21,10 +21,11 @@ public class Main {
         Writer errWriter = null;
         String text="";
         try {
-            String fileName = "E:/IJworkspace/compile-experiment-/code.txt";
+            String fileName = "code.txt";
             Scanner in=new Scanner(new File(fileName));
             while (in.hasNextLine()){
                 text+=in.nextLine();
+                text+='\n';
             }
             reader = new FileReader(fileName);
             char[] cs = new char[1024];
