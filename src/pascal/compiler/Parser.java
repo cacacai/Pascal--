@@ -134,7 +134,6 @@ public class Parser {
             }
         }else {
             error("ERROR：缺少“;”！违背产生式：<语句表>-><语句>|<语句>;<语句表>");
-            System.exit(0);
         }
 
         /*else if (current.getTokenKind()==Token.TokenKind.END){
@@ -159,10 +158,8 @@ public class Parser {
         }else{
             if (current.getTokenKind()==Token.TokenKind.EOF){
                 error("ERROR： 代码结束");
-                System.exit(0);
             }
             error("ERROR：非法的语句");
-            System.exit(0);
         }
     }
 
@@ -194,8 +191,6 @@ public class Parser {
             next();
         }else {
             error("ERROR：关系表达式后缺少“THEN”! 违背产生式：<条件语句>->IF<关系表达式>THEN<语句>ELSE<语句>");
-            System.exit(0);
-            return;
         }
         statement();
         next();//吃掉 ；
@@ -203,7 +198,6 @@ public class Parser {
             next();
         }else{
             error("ERROR：语句后缺少“ELSE”!违背产生式：<条件语句>->IF<关系表达式>THEN<语句>ELSE<语句>");
-            System.exit(0);
         }
         statement();
     }
@@ -256,14 +250,14 @@ public class Parser {
         next();
         Token token = peek();
         //INTEGER;    结尾
-        if (current.getTokenKind() == Token.TokenKind.INTEGER && token.getTokenKind() == Token.TokenKind.SEMI){
+        if (current.getTokenKind() == Token.TokenKind.INTEGER || token.getTokenKind() == Token.TokenKind.SEMI){
             next();
             token = peek();
             //如果变量表结束了 使用$符号判断结束标记
             if (current.getTokenKind()==Token.TokenKind.SEMI&&token.getTokenKind()==Token.TokenKind.BEGIN){
                 return;
             }else if (current.getTokenKind()!=Token.TokenKind.SEMI){
-                error("ERROR：缺少“;”!\\t违背产生式：<变量说明表>-><变量表>:<类型>|<变量表>:<类型>;<变量说明表>");
+                error("ERROR：缺少“;”!违背产生式：<变量说明表>-><变量表>:<类型>|<变量表>:<类型>;<变量说明表>");
                 return;
             }
             declarationTable();
@@ -389,6 +383,7 @@ public class Parser {
 
     private void error(String err_msg){
         System.out.println(lineCount+" "+err_msg+" currentToken:"+current.getSymbol());
+        System.exit(0);
     }
 
 
