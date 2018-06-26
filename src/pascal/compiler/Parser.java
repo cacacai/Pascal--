@@ -99,7 +99,11 @@ public class Parser {
         if (current.getTokenKind().equals(Token.TokenKind.BEGIN)){
             //语句表
             next();
-            statementTable();
+            try {
+                statementTable();
+            }catch (Exception e){
+
+            }
             //next();
             Token token=peek();
             //END.
@@ -117,20 +121,25 @@ public class Parser {
     private void statementTable(){
         //语句
         statement();
-        if (current.getTokenKind()==Token.TokenKind.SEMI||endFlag==1){
-            if (endFlag!=1){
+        if (current.getTokenKind()==Token.TokenKind.SEMI){
+            next();
+            if (current.getTokenKind()!=Token.TokenKind.END){
+                statementTable();
+            }else if (endFlag==1&&current.getTokenKind()==Token.TokenKind.END){
                 next();
+                endFlag=0;
+                statementTable();
+            }else if (endFlag==0&&current.getTokenKind()==Token.TokenKind.END){
+                throw new RuntimeException();//强行退出递归
             }
-
-            endFlag=0;
-            statementTable();
-        }else if (current.getTokenKind()==Token.TokenKind.END){
-            return;
         }else {
-
             error("ERROR：缺少“;”！违背产生式：<语句表>-><语句>|<语句>;<语句表>");
             System.exit(0);
         }
+
+        /*else if (current.getTokenKind()==Token.TokenKind.END){
+            return;
+        }*/
     }
 
     //语句->赋值语句/条件语句/while语句/复合语句
@@ -185,15 +194,16 @@ public class Parser {
             next();
         }else {
             error("ERROR：关系表达式后缺少“THEN”! 违背产生式：<条件语句>->IF<关系表达式>THEN<语句>ELSE<语句>");
+            System.exit(0);
             return;
         }
         statement();
-        next();
+        next();//吃掉 ；
         if (current.getTokenKind()==Token.TokenKind.ELSE){
             next();
         }else{
             error("ERROR：语句后缺少“ELSE”!违背产生式：<条件语句>->IF<关系表达式>THEN<语句>ELSE<语句>");
-            return;
+            System.exit(0);
         }
         statement();
     }
@@ -213,13 +223,13 @@ public class Parser {
     //复合语句
     private void complexStatement(){
         //语句表
+        endFlag=1;
         next();
         statementTable();
         if (current.getTokenKind()==Token.TokenKind.END){
-            next();
-            endFlag=1;
+
         }else{
-            error("ERROR：缺少“END”!\\t违背产生式：<复合语句>->BEGIN<语句表>END");
+            error("ERROR：缺少“END”!违背产生式：<复合语句>->BEGIN<语句表>END");
             return;
         }
 
