@@ -3,17 +3,18 @@ VAR A,B,B3Y,C12A1,DD : INTEGER;
 BEGIN
   A:= 300 ;
  B3Y :=100 ;
- IF A> B3Y  THEN
-   A:=A+ B3Y;
- ELSE
-  C12A1 :=  2 * A ;
-WHILE  I <=100 		DO
+ IF A< B3Y  THEN
+   A:=A+ B3Y
+  ELSE
+   C12A1 :=  2 * A;
+WHILE  I <=100 DO
 		 BEGIN
-			IF I < J + 5 THEN
-				J :=J 	+ 5;
+			IF I <>  J + 5 THEN
+				J :=J 	+ 5
 			ELSE
 				X12Z :=	X12Z +Z;
-			 I:=I+   1;
-	   END
+			 I:=I+   1
+	   END;
 	S1234 	:=    10 +20 * (I+ 0);
-  END.
+	S1234 	:=    10
+	END.

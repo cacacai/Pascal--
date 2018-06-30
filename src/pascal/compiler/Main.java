@@ -28,13 +28,8 @@ public class Main {
                 text+='\n';
             }
             reader = new FileReader(fileName);
-            char[] cs = new char[1024];
-            int len = reader.read(cs);
-            //CharReader cReader = new CharReader(cs,len);
-            //TokenizerBak tokenizer = new TokenizerBak(cReader);
             TextLex textLex=new TextLex(text);
 
-            //boolean success = tokenizer.readAllToken();
             boolean success = textLex.scannerAll();
             List<Token> tokenList = textLex.getTokenList();
             List<TextLex.Error> errorList = textLex.getErrorList();
@@ -55,10 +50,11 @@ public class Main {
                     errWriter.write("line"+error.getLine()+":"+error.getMsg()+"\n");
                 }
             }
-            //测试语法分析器
+
+            //语法分析器
             Parser parser = new Parser(tokenList);
             parser.parse();
-            System.out.println("size:"+tokenList.size());
+            System.out.println("正确");
 
         } catch (IOException e) {
             e.printStackTrace();

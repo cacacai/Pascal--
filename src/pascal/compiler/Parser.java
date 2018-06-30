@@ -8,7 +8,6 @@ import java.util.*;
  */
 public class Parser {
 
-    private List errorList ;
     private List<Token> tokenList;
     private int lineCount = 1;
     private Token current;
@@ -66,17 +65,17 @@ public class Parser {
         if (current.getTokenKind().equals(Token.TokenKind.PROGRAM)){//program
             next();//标识符
             if (current.getTokenKind().equals(Token.TokenKind.IDENTIFIER)){
-                next();//;
+                next();//IDENTIFIER
                 if (current.getTokenKind().equals(Token.TokenKind.SEMI)){
                     //分程序-><变量说明>BEGIN<语句表>END
                     next();
                     //如果存在着变量说明
-                    if (current.getTokenKind()!=Token.TokenKind.VAR){
-                        error("ERROR：缺少VAR!\\t违背产生式：<变量说明>->VAR<变量说明表>");
-                        return;
-                    }else{
+                    if (current.getTokenKind()==Token.TokenKind.VAR){
                         //变量说明
                         declarationTable();
+                    }else{
+                        error("ERROR：缺少VAR!违背产生式：<变量说明>->VAR<变量说明表>");
+                        return;
                     }
                     //BEGIN<语句表>END
                     subProgram();
@@ -99,10 +98,9 @@ public class Parser {
         if (current.getTokenKind().equals(Token.TokenKind.BEGIN)){
             //语句表
             next();
-            try {
+            try {//捕抓异常，强行中断递归
                 statementTable();
             }catch (Exception e){
-
             }
             //next();
             Token token=peek();
@@ -121,9 +119,11 @@ public class Parser {
     private void statementTable(){
         //语句
         statement();
-        if (current.getTokenKind()==Token.TokenKind.SEMI){
+        Token token=peek();
+        if (current.getTokenKind()==Token.TokenKind.SEMI&&token.getTokenKind()!=Token.TokenKind.END){
             next();
-            if (current.getTokenKind()!=Token.TokenKind.END){
+            statementTable();
+            /*if (current.getTokenKind()!=Token.TokenKind.END){
                 statementTable();
             }else if (endFlag==1&&current.getTokenKind()==Token.TokenKind.END){
                 next();
@@ -131,14 +131,15 @@ public class Parser {
                 statementTable();
             }else if (endFlag==0&&current.getTokenKind()==Token.TokenKind.END){
                 throw new RuntimeException();//强行退出递归
-            }
+            }*/
+        }else if(current.getTokenKind()==Token.TokenKind.END){
+
+        }else if (current.getTokenKind()==Token.TokenKind.SEMI&&token.getTokenKind()==Token.TokenKind.END){
+            statement();
         }else {
             error("ERROR：缺少“;”！违背产生式：<语句表>-><语句>|<语句>;<语句表>");
         }
 
-        /*else if (current.getTokenKind()==Token.TokenKind.END){
-            return;
-        }*/
     }
 
     //语句->赋值语句/条件语句/while语句/复合语句
@@ -151,8 +152,8 @@ public class Parser {
             whileStatement();
         }else if (current.getTokenKind()==Token.TokenKind.BEGIN){//复合语句
             complexStatement();
-        }else if (current.getTokenKind()==Token.TokenKind.SEMI||current.getTokenKind()==Token.TokenKind.END){
-            return;
+        }else if (current.getTokenKind()==Token.TokenKind.END){
+            return;//current.getTokenKind()==Token.TokenKind.SEMI||
         }else if (current.getTokenKind()==Token.TokenKind.EOLN){
             lineCount++;
         }else{
@@ -193,7 +194,7 @@ public class Parser {
             error("ERROR：关系表达式后缺少“THEN”! 违背产生式：<条件语句>->IF<关系表达式>THEN<语句>ELSE<语句>");
         }
         statement();
-        next();//吃掉 ；
+        //next();//吃掉 ；
         if (current.getTokenKind()==Token.TokenKind.ELSE){
             next();
         }else{
@@ -221,7 +222,7 @@ public class Parser {
         next();
         statementTable();
         if (current.getTokenKind()==Token.TokenKind.END){
-
+            next();
         }else{
             error("ERROR：缺少“END”!违背产生式：<复合语句>->BEGIN<语句表>END");
             return;
@@ -237,33 +238,28 @@ public class Parser {
         //多个变量表
         //next();
         if (current.getTokenKind()==Token.TokenKind.COLON){
-            declarationTable2();//处理 :Integer
+            //处理 :Integer
+            next();
+            Token token = peek();
+            //INTEGER;    结尾
+            if (current.getTokenKind() == Token.TokenKind.INTEGER ){
+                next();
+                token = peek();
+                //变量表结束了
+                if (current.getTokenKind()==Token.TokenKind.SEMI&&token.getTokenKind()==Token.TokenKind.BEGIN){
+                    return;
+                }else if (current.getTokenKind()!=Token.TokenKind.SEMI){
+                    error("ERROR：缺少“;”!违背产生式：<变量说明表>-><变量表>:<类型>|<变量表>:<类型>;<变量说明表>");
+                }
+                declarationTable();
+            }else {
+                error("ERROR：缺少类型INTEGER!违背产生式：<类型>->INTEGER;");
+            }
         }else{
             error("ERROR：变量表后缺少“:”!违背产生式：<变量说明表>-><变量表>:<类型>|<变量表>:<类型>;<变量说明表>");
             return;
         }
 
-    }
-
-    // :INTEGER;
-    private void declarationTable2(){
-        next();
-        Token token = peek();
-        //INTEGER;    结尾
-        if (current.getTokenKind() == Token.TokenKind.INTEGER || token.getTokenKind() == Token.TokenKind.SEMI){
-            next();
-            token = peek();
-            //如果变量表结束了 使用$符号判断结束标记
-            if (current.getTokenKind()==Token.TokenKind.SEMI&&token.getTokenKind()==Token.TokenKind.BEGIN){
-                return;
-            }else if (current.getTokenKind()!=Token.TokenKind.SEMI){
-                error("ERROR：缺少“;”!违背产生式：<变量说明表>-><变量表>:<类型>|<变量表>:<类型>;<变量说明表>");
-                return;
-            }
-            declarationTable();
-        }else {
-            error("ERROR：缺少类型INTEGER!违背产生式：<类型>->INTEGER;");
-        }
     }
 
     /**
@@ -275,9 +271,12 @@ public class Parser {
         next();
         if (current.getTokenKind() == Token.TokenKind.IDENTIFIER){
             next();
-            //,
             if (current.getTokenKind()==Token.TokenKind.COMMA){
                 declarationStatement();//如果后面是分号说明还有变量
+            }else if (current.getTokenKind()==Token.TokenKind.COLON){
+
+            }else{
+                error("ERROR：缺少 , 违背产生式：<变量表>-><变量>|，<变量>;变量表");
             }
         }else{
             error("ERROR：缺少标识符!违背产生式：<变量>-><标识符>");
@@ -353,9 +352,6 @@ public class Parser {
         //算术表达式
         arithmeticExpression();
         //关系符
-        /*if (current.getTokenKind()==Token.TokenKind.THEN){
-            return;
-        }*/
         relationOperator();
         //算术表达式
         if (current.getTokenKind()==Token.TokenKind.INT||current.getTokenKind()==Token.TokenKind.IDENTIFIER){
@@ -363,10 +359,8 @@ public class Parser {
         }else{
             error("ERROR：算术表达式非法!违背产生式：<关系表达式>-><算术表达式><关系符><算术表达式>");
         }
-
-
     }
-
+    //关系符
     private void relationOperator(){
         if (current.getTokenKind() == Token.TokenKind.LESS//<
                 || current.getTokenKind() == Token.TokenKind.LESS_OR_EQUAL//<=
@@ -381,10 +375,9 @@ public class Parser {
         }
     }
 
+    //报错直接退出
     private void error(String err_msg){
         System.out.println(lineCount+" "+err_msg+" currentToken:"+current.getSymbol());
         System.exit(0);
     }
-
-
 }
