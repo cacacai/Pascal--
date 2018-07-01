@@ -1,6 +1,7 @@
-package pascal.compiler;
+package pascal.senmantic;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  语法分析器。
@@ -9,20 +10,24 @@ import java.util.*;
 public class Parser {
 
     private List<Token> tokenList;
-    private int lineCount = 1;
+    private List<Quaternary> quaternaryList;
+    private int quaternaryCount = 0;
+    private int temp=0;
+    private int lineNum = 1;
     private Token current;
-    private int endFlag=0;
+    private String arg2="";
 
 
     public Parser(List<Token> tokenList) {
         this.tokenList = tokenList;
+        this.quaternaryList=new ArrayList<>();
     }
 
     //获取下一个字符
     private void next(){
         current = tokenList.remove(0);//删除的同时返回被删除的元素
         while (current.getTokenKind()== Token.TokenKind.EOLN){
-            lineCount++;
+            lineNum++;
             current = tokenList.remove(0);
         }
     }
@@ -53,12 +58,32 @@ public class Parser {
         return peek(0);
     }
 
+    /**
+     *  语义分析
+     */
+    //根据给的实参产生一个四元式
+    int gen(String op,String arg1,String arg2,String result){
+        Quaternary quaternary=new Quaternary(op, arg1, arg2, result);
+        quaternaryList.add(quaternary);
+        return quaternaryCount++;
+    }
+
+    //产生临时变量的函数
+    int newTemp(){
+        return temp++;
+    }
+
+
     //开始
     public void parse(){
         program();
+        for (Quaternary t :
+                quaternaryList) {
+            System.out.println(t.toString());
+        }
     }
 
-    //开始判断文法
+    //语法分析
     private void program(){
         next();
         //程序->PROGRAM<标识符>;<分程序>
@@ -118,6 +143,7 @@ public class Parser {
     //语句表-><语句>|<语句>;<语句表>
     private void statementTable(){
         //语句
+        //语句
         statement();
         Token token=peek();
         if (current.getTokenKind()==Token.TokenKind.SEMI&&token.getTokenKind()!=Token.TokenKind.END){
@@ -130,6 +156,7 @@ public class Parser {
         }else {
             error("ERROR：缺少“;”！违背产生式：<语句表>-><语句>|<语句>;<语句表>");
         }
+
 
     }
 
@@ -146,7 +173,7 @@ public class Parser {
         }else if (current.getTokenKind()==Token.TokenKind.END){
             return;//current.getTokenKind()==Token.TokenKind.SEMI||
         }else if (current.getTokenKind()==Token.TokenKind.EOLN){
-            lineCount++;
+            lineNum++;
         }else{
             if (current.getTokenKind()==Token.TokenKind.EOF){
                 error("ERROR： 代码结束");
@@ -160,6 +187,8 @@ public class Parser {
      *     赋值语句->变量:=算术表达式
      */
     private void assignStatement(){
+        String op=":=";
+        String arg1= current.getSymbol();
         next();
         //匹配 :=
         if (current.getTokenKind()==Token.TokenKind.ASSIGNMENT){
@@ -171,6 +200,8 @@ public class Parser {
             return;
         }
         arithmeticExpression();
+        gen(op,arg1,arg2,"-");
+
     }
 
     //if
@@ -209,7 +240,6 @@ public class Parser {
     //复合语句
     private void complexStatement(){
         //语句表
-        endFlag=1;
         next();
         statementTable();
         if (current.getTokenKind()==Token.TokenKind.END){
@@ -280,15 +310,20 @@ public class Parser {
         if (current.getTokenKind()==Token.TokenKind.IDENTIFIER||current.getTokenKind()==Token.TokenKind.INT||current.getTokenKind()==Token.TokenKind.LPAREN){
             //项
             item();
-        }else if (current.getTokenKind()==Token.TokenKind.MUL||current.getTokenKind()==Token.TokenKind.DIV){
-            item();
         }else{
             error("ERROR：算术表达式不合法，缺少项！违背产生式：<算术表达式>-><项>|<算术表达式>+<项>|<算术表达式>-<项>");
             return;
         }
+
         if (current.getTokenKind()==Token.TokenKind.PLUS||current.getTokenKind()==Token.TokenKind.SUB){
             next();
+            String op=current.getSymbol();
+            String arg1=arg2;
             arithmeticExpression();
+            int quaternaryNum=newTemp();
+            String result="T"+quaternaryNum;
+            gen(op,arg1,arg2,result);
+            arg2=result;
         }else if (current.getTokenKind()==Token.TokenKind.INT){
             error("ERROR：缺少算符！违背产生式：<算术表达式>-><项>|<算术表达式>+<项>|<算术表达式>-<项>");
             return;
@@ -302,6 +337,7 @@ public class Parser {
     private void item(){
         Token.TokenKind temp=current.getTokenKind();
         if (temp==Token.TokenKind.IDENTIFIER||temp==Token.TokenKind.INT||temp==Token.TokenKind.LPAREN){
+            arg2=current.getSymbol();
             //因式
             factor();
         }else{
@@ -310,18 +346,22 @@ public class Parser {
         }
         temp=current.getTokenKind();
         if (temp==Token.TokenKind.MUL||temp==Token.TokenKind.DIV){
+            String op=current.getSymbol();
+            String arg1=arg2;
             next();
             item();
-        }/*else if (temp==Token.TokenKind.INT){
-            error("ERROR：缺少算符！违背产生式：<项>-><因式>|<项>*<因式>|<项>/<因式>");
-            return;
-        }*/
+            int quaternaryNum=newTemp();
+            String result="T"+quaternaryNum;
+            gen(op,arg1,arg2,result);
+            arg2=result;
+        }
     }
 
     //因式->变量|常数|（算术表达式）
     private void factor(){
         //变量或者常数
         if (current.getTokenKind() == Token.TokenKind.IDENTIFIER || current.getTokenKind() == Token.TokenKind.INT){
+            arg2=current.getSymbol();
             next();
         }else if(current.getTokenKind() == Token.TokenKind.LPAREN){//(
             next();
@@ -368,7 +408,7 @@ public class Parser {
 
     //报错直接退出
     private void error(String err_msg){
-        System.out.println(lineCount+" "+err_msg+" currentToken:"+current.getSymbol());
+        System.out.println(lineNum +" "+err_msg+" currentToken:"+current.getSymbol());
         System.exit(0);
     }
 }
