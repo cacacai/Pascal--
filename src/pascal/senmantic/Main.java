@@ -1,4 +1,4 @@
-package pascal.compiler;
+package pascal.senmantic;
 
 import java.io.*;
 import java.util.List;
@@ -47,7 +47,7 @@ public class Main {
             //语法分析器
             Parser parser = new Parser(tokenList);
             parser.parse();
-            System.out.println("正确");
+            System.out.println("语法正确");
 
         } catch (IOException e) {
             e.printStackTrace();
