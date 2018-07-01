@@ -165,7 +165,6 @@ public class Parser {
     }
 
     /**
-     *
      *     赋值语句->变量:=算术表达式
      */
     private void assignStatement(){
@@ -174,7 +173,6 @@ public class Parser {
         if (current.getTokenKind()==Token.TokenKind.ASSIGNMENT){
             //算术表达式
             next();
-
         }else{
             error(" ERROR：变量后缺少赋值符号“:=”! 违背产生式：<赋值语句>-><变量>:=<算术表达式>");
             return;
