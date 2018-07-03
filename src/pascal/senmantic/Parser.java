@@ -1,6 +1,5 @@
 package pascal.senmantic;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +14,6 @@ public class Parser {
     private int temp=0;
     private int lineNum = 1;
     private Token current;
-    private String arg2="";
 
 
     public Parser(List<Token> tokenList,List<Quaternary> quaternaryList) {
@@ -63,10 +61,8 @@ public class Parser {
      */
     //根据给的实参产生一个四元式
     int gen(String op,String arg1,String arg2,String result){
-        Quaternary quaternary=new Quaternary(op, arg1, arg2, result);
-        quaternaryList.add(quaternary);
-        NXQ++;
-        return NXQ;
+        quaternaryList.add(new Quaternary(op, arg1, arg2, result));
+        return ++NXQ;
     }
 
     //产生临时变量的函数
@@ -184,12 +180,13 @@ public class Parser {
     private void assignStatement(){
         String op=":=";
         String arg1= current.getSymbol();
+        String arg2="";
         next();
         //匹配 :=
         if (current.getTokenKind()==Token.TokenKind.ASSIGNMENT){
             //算术表达式
             next();
-            arithmeticExpression();
+            arg2=arithmeticExpression();
         }else{
             error(" ERROR：变量后缺少赋值符号“:=”! 违背产生式：<赋值语句>-><变量>:=<算术表达式>");
             return;
@@ -302,69 +299,75 @@ public class Parser {
     }
 
     //<算术表达式>-><项>|<算术表达式>+<项>|<算术表达式>-<项>
-    private void arithmeticExpression(){
+    private String arithmeticExpression(){
+        String arg2="";
         //因式->变量/数字/(因式)
         if (isIDENTIFIER() || isINT() || isLPAREN()){
             //项
-            item();
+            arg2=item();
         }else{
             error("ERROR：算术表达式不合法，缺少项！违背产生式：<算术表达式>-><项>|<算术表达式>+<项>|<算术表达式>-<项>");
-            return;
+            return null;
         }
         if (current.getTokenKind()==Token.TokenKind.PLUS||current.getTokenKind()==Token.TokenKind.SUB){
             String op=current.getSymbol();
             String arg1=arg2;
             next();
-            arithmeticExpression();
+            arg2=arithmeticExpression();
             int quaternaryNum=newTemp();
             String result="T"+quaternaryNum;
             gen(op,arg1,arg2,result);
             arg2=result;
         }
+        return arg2;
     }
 
     //项  <项>-><因式>|<项>*<因式>|<项>/<因式>
-    private void item(){
+    private String item(){
+        String arg2="";
         if (isIDENTIFIER()||isINT()||isLPAREN()){
-            arg2=current.getSymbol();
             //因式
-            factor();
+            arg2=factor();
         }else{
             error("ERROR：算术表达式不合法，缺少项！违背产生式：<项>-><因式>|<项>*<因式>|<项>/<因式>");
-            return;
+            return null;
         }
         Token.TokenKind temp=current.getTokenKind();
         if (temp==Token.TokenKind.MUL||temp==Token.TokenKind.DIV){
             String op=current.getSymbol();
             String arg1=arg2;
             next();
-            item();
+            arg2=item();
             int quaternaryNum=newTemp();
             String result="T"+quaternaryNum;
             gen(op,arg1,arg2,result);
             arg2=result;
+            return arg2;
         }
+        return arg2;
     }
 
     //因式->变量|常数|（算术表达式）
-    private void factor(){
+    private String factor(){
         //变量或者常数
+        String arg2="";
         if (isIDENTIFIER() || isINT()){
             arg2=current.getSymbol();
             next();
         }else if(isLPAREN()){//(
             next();
-            arithmeticExpression();
+            arg2=arithmeticExpression();
             if (current.getTokenKind()==Token.TokenKind.RPAREN){
                 next();
             }else {
                 error("ERROR：缺少“)”！");
-                return;
+                return null;
             }
         }else{
             error("ERROR：这个因式不合法!!!!!！");
-            return;
+            return null;
         }
+        return arg2;
     }
 
 

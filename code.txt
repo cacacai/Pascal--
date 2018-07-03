@@ -1,7 +1,7 @@
 PROGRAM Passed1;
 VAR A,B,B3Y,C12A1,DD : INTEGER;
 BEGIN
-  A:= 300 ;
+     A:= 300  ;
  B3Y :=100 ;
  IF A< B3Y  THEN
    A:=A+ B3Y
@@ -15,6 +15,5 @@ WHILE  I <=100 DO
 				X12Z :=	X12Z +Z;
 			 I:=I+   1
 	   END;
-	S1234 	:=    10 +20 * (I+ 0);
-	S1234 	:=    10
+	S1234 	:=    10 +20 * (I+ 0)
 	END.
