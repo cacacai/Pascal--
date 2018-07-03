@@ -11,16 +11,16 @@ public class Parser {
 
     private List<Token> tokenList;
     private List<Quaternary> quaternaryList;
-    private int quaternaryCount = 0;
+    private int NXQ = 0;
     private int temp=0;
     private int lineNum = 1;
     private Token current;
     private String arg2="";
 
 
-    public Parser(List<Token> tokenList) {
+    public Parser(List<Token> tokenList,List<Quaternary> quaternaryList) {
         this.tokenList = tokenList;
-        this.quaternaryList=new ArrayList<>();
+        this.quaternaryList=quaternaryList;
     }
 
     //获取下一个字符
@@ -65,7 +65,8 @@ public class Parser {
     int gen(String op,String arg1,String arg2,String result){
         Quaternary quaternary=new Quaternary(op, arg1, arg2, result);
         quaternaryList.add(quaternary);
-        return quaternaryCount++;
+        NXQ++;
+        return NXQ;
     }
 
     //产生临时变量的函数
@@ -76,10 +77,6 @@ public class Parser {
     //开始
     public void parse(){
         program();
-        for (Quaternary t :
-                quaternaryList) {
-            System.out.println(t.toString());
-        }
     }
 
     //语法分析
@@ -192,12 +189,11 @@ public class Parser {
         if (current.getTokenKind()==Token.TokenKind.ASSIGNMENT){
             //算术表达式
             next();
-
+            arithmeticExpression();
         }else{
             error(" ERROR：变量后缺少赋值符号“:=”! 违背产生式：<赋值语句>-><变量>:=<算术表达式>");
             return;
         }
-        arithmeticExpression();
         gen(op,arg1,arg2,"-");
 
     }
@@ -305,8 +301,6 @@ public class Parser {
         }
     }
 
-
-
     //<算术表达式>-><项>|<算术表达式>+<项>|<算术表达式>-<项>
     private void arithmeticExpression(){
         //因式->变量/数字/(因式)
@@ -317,7 +311,6 @@ public class Parser {
             error("ERROR：算术表达式不合法，缺少项！违背产生式：<算术表达式>-><项>|<算术表达式>+<项>|<算术表达式>-<项>");
             return;
         }
-
         if (current.getTokenKind()==Token.TokenKind.PLUS||current.getTokenKind()==Token.TokenKind.SUB){
             String op=current.getSymbol();
             String arg1=arg2;
@@ -378,6 +371,7 @@ public class Parser {
 
     //关系表达式->算术表达式 关系符 算术表达式
     private void conditionExpression(){
+        String op=current.getSymbol();
         //算术表达式
         arithmeticExpression();
         //关系符

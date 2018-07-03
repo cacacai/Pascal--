@@ -18,7 +18,7 @@ public class Quaternary {
 
     @Override
     public String toString() {
-        return "("+op+","+arg1+","+arg2+","+result+",)";
+        return "("+op+","+arg1+","+arg2+","+result+")";
     }
 
     public String getOp() {

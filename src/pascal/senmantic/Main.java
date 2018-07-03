@@ -1,12 +1,16 @@
 package pascal.senmantic;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 /**
  */
 public class Main {
+    private static List<Token> tokenList=null;
+    private static List<Quaternary> quaternaryList=null;
+
 
     public static void main(String[] args) {
         Reader reader = null;
@@ -24,7 +28,8 @@ public class Main {
             TextLex textLex=new TextLex(text);
 
             boolean success = textLex.scannerAll();
-            List<Token> tokenList = textLex.getTokenList();
+            tokenList= textLex.getTokenList();
+            quaternaryList=new ArrayList<>();
             List<TextLex.Error> errorList = textLex.getErrorList();
             tokenWriter = new FileWriter("lex.dyd");
             String temp="";
@@ -45,10 +50,19 @@ public class Main {
             }
 
             //语法分析器
-            Parser parser = new Parser(tokenList);
+            Parser parser = new Parser(tokenList,quaternaryList);
             parser.parse();
             System.out.println("语法正确");
+            for (Quaternary t :
+                    quaternaryList) {
+                System.out.println(t.toString());
+            }
+            for (Token token:tokenList){
+                if (token.getIndex()!=-1){
+                    System.out.println(token.getIndex()+" "+token.getSymbol());
+                }
 
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
