@@ -366,7 +366,9 @@ public class Parser {
 
     //报错直接退出
     private void error(String err_msg){
-        System.out.println(lineCount+" "+err_msg+" currentToken:"+current.getSymbol());
+        System.out.println("行号"+lineCount+" ");
+        System.out.println(err_msg+" 当前读取字符  "+current.getSymbol());
+
         System.exit(0);
     }
 }

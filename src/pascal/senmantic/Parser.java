@@ -68,7 +68,6 @@ public class Parser {
         NXQ++;
         return NXQ;
     }
-
     //产生临时变量的函数
     int newTemp(){
         return temp++;
@@ -110,7 +109,6 @@ public class Parser {
         }else{
                 error("ERROR：开始缺少PROGRAM! 违背产生式：<程序>->PROGRAM<标识符>;<分程序>");
         }
-
     }
 
     //BEGIN<语句表>END.
@@ -144,15 +142,12 @@ public class Parser {
         if (isSEMI() &&token.getTokenKind()!=Token.TokenKind.END){
             next();
             statementTable();
-        }else if(isEND()){
-
         }else if (isSEMI() &&token.getTokenKind()==Token.TokenKind.END){
             statement();
+        }else if(isEND()){
         }else {
             error("ERROR：缺少“;”！违背产生式：<语句表>-><语句>|<语句>;<语句表>");
         }
-
-
     }
 
     //语句->赋值语句/条件语句/while语句/复合语句
@@ -206,17 +201,16 @@ public class Parser {
         conditionExpression();
         if (current.getTokenKind() == Token.TokenKind.THEN){
             next();
+            statement();
         }else {
             error("ERROR：关系表达式后缺少“THEN”! 违背产生式：<条件语句>->IF<关系表达式>THEN<语句>ELSE<语句>");
         }
-        statement();
-        //next();//吃掉 ；
         if (current.getTokenKind()==Token.TokenKind.ELSE){
             next();
+            statement();
         }else{
             error("ERROR：语句后缺少“ELSE”!违背产生式：<条件语句>->IF<关系表达式>THEN<语句>ELSE<语句>");
         }
-        statement();
     }
 
     //while
@@ -274,7 +268,6 @@ public class Parser {
             error("ERROR：变量表后缺少“:”!违背产生式：<变量说明表>-><变量表>:<类型>|<变量表>:<类型>;<变量说明表>");
             return;
         }
-
     }
 
 
@@ -421,7 +414,7 @@ public class Parser {
         return current.getTokenKind() == Token.TokenKind.LPAREN;
     }
     private boolean isINT() {
-        return current.getTokenKind()==Token.TokenKind.INT;
+        return current.getTokenKind()==Token.TokenKind.INTEGER;
     }
     private boolean isCOLON() {
         return current.getTokenKind()==Token.TokenKind.COLON;
