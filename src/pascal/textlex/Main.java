@@ -61,7 +61,7 @@ public class Main {
             }
             System.out.println("************变量表**********");
             for (Token token:tokenList){
-                if (token.getTokenKind().no!=28){
+                if (token.getTokenKind()!=Token.TokenKind.EOLN){
                     System.out.format("%s\t\t\t%d\n",token.getSymbol(),token.getTokenKind().no);
                 }
 
