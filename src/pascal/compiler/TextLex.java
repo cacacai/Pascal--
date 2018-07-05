@@ -112,7 +112,8 @@ public class TextLex {
                     tokenList.add(new Token(s,Token.TokenKind.ASSIGNMENT));
 					return i+2;
 				}else {
-					tokenList.add(new Token(s,Token.TokenKind.COLON));
+					//tokenList.add(new Token(s,Token.TokenKind.COLON));
+					error("分号出现错误");
                     return i+1;
                 }
 			case ',':
@@ -190,7 +191,7 @@ public class TextLex {
                     tokenList.add(new Token(s, Token.TokenKind.IDENTIFIER,Integer.parseInt(identifierList.get(s))));
                     return i;
         }
-        if (ch!=' '&&ch!='\n'&&ch!='\t'&&ch!='\r'&&ch!=';'&&ch!='{'){
+        if (ch!=' '&&ch!='\n'&&ch!='\t'&&ch!='\r'&&ch!=';'&&ch!='{'&&ch!='.'){
             error(ch+"关键字后不能有字符");
         }
         return i;
@@ -206,15 +207,15 @@ public class TextLex {
 		}
         if((text.charAt(i)==' ')||(text.charAt(i)==')')||(text.charAt(i)=='\t')||(text.charAt(i)=='\n')||(text.charAt(i)=='\r')||(text.charAt(i)=='\0')||(text.charAt(i)==';')||(isKey(text.charAt(i)+"")>0)){
 			// 到了结尾，输出数字
-            tokenList.add(new Token(s, Token.TokenKind.INT));
+            tokenList.add(new Token(s, Token.TokenKind.INTEGER));
 			return i;
 		}
 		else if (ch=='+'||ch=='-'||ch=='*'||ch=='/'||ch=='\0') {
-            tokenList.add(new Token(s, Token.TokenKind.INT));
+            tokenList.add(new Token(s, Token.TokenKind.INTEGER));
 			return i;
 		}
 		else if (ch=='+'||ch=='-'||ch=='*'||ch=='/'||ch=='\0') {
-            tokenList.add(new Token(s, Token.TokenKind.INT));
+            tokenList.add(new Token(s, Token.TokenKind.INTEGER));
 			return i;
 		}
 		else {
