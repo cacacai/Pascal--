@@ -275,7 +275,7 @@ public class Parser {
     //<算术表达式>-><项>|<算术表达式>+<项>|<算术表达式>-<项>
     private void arithmeticExpression(){
         //因式->变量/数字/(因式)
-        if (current.getTokenKind()==Token.TokenKind.IDENTIFIER||current.getTokenKind()==Token.TokenKind.INT||current.getTokenKind()==Token.TokenKind.LPAREN){
+        if (current.getTokenKind()==Token.TokenKind.IDENTIFIER||current.getTokenKind()==Token.TokenKind.INTEGER||current.getTokenKind()==Token.TokenKind.LPAREN){
             //项
             item();
         }else if (current.getTokenKind()==Token.TokenKind.MUL||current.getTokenKind()==Token.TokenKind.DIV){
@@ -287,7 +287,7 @@ public class Parser {
         if (current.getTokenKind()==Token.TokenKind.PLUS||current.getTokenKind()==Token.TokenKind.SUB){
             next();
             arithmeticExpression();
-        }else if (current.getTokenKind()==Token.TokenKind.INT){
+        }else if (current.getTokenKind()==Token.TokenKind.INTEGER){
             error("ERROR：缺少算符！违背产生式：<算术表达式>-><项>|<算术表达式>+<项>|<算术表达式>-<项>");
             return;
         }else if (current.getTokenKind()==Token.TokenKind.EQUAL){
@@ -299,7 +299,7 @@ public class Parser {
     //项  <项>-><因式>|<项>*<因式>|<项>/<因式>
     private void item(){
         Token.TokenKind temp=current.getTokenKind();
-        if (temp==Token.TokenKind.IDENTIFIER||temp==Token.TokenKind.INT||temp==Token.TokenKind.LPAREN){
+        if (temp==Token.TokenKind.IDENTIFIER||temp==Token.TokenKind.INTEGER||temp==Token.TokenKind.LPAREN){
             //因式
             factor();
         }else{
@@ -319,7 +319,7 @@ public class Parser {
     //因式->变量|常数|（算术表达式）
     private void factor(){
         //变量或者常数
-        if (current.getTokenKind() == Token.TokenKind.IDENTIFIER || current.getTokenKind() == Token.TokenKind.INT){
+        if (current.getTokenKind() == Token.TokenKind.IDENTIFIER || current.getTokenKind() == Token.TokenKind.INTEGER){
             next();
         }else if(current.getTokenKind() == Token.TokenKind.LPAREN){//(
             next();
@@ -343,7 +343,7 @@ public class Parser {
         //关系符
         relationOperator();
         //算术表达式
-        if (current.getTokenKind()==Token.TokenKind.INT||current.getTokenKind()==Token.TokenKind.IDENTIFIER){
+        if (current.getTokenKind()==Token.TokenKind.INTEGER||current.getTokenKind()==Token.TokenKind.IDENTIFIER){
             arithmeticExpression();
         }else{
             error("ERROR：算术表达式非法!违背产生式：<关系表达式>-><算术表达式><关系符><算术表达式>");

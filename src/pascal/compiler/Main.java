@@ -1,7 +1,9 @@
 package pascal.compiler;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -41,13 +43,31 @@ public class Main {
                 errWriter.flush();
                 for (TextLex.Error error:errorList){
                     errWriter.write("line"+error.getLine()+":"+error.getMsg()+"\n");
+                    System.out.println("line"+error.getLine()+":"+error.getMsg());
                 }
+            }else{
+                System.out.println("没有错误");
+            }
+            Map<Token,String> keyTemp=new HashMap<>();
+            System.out.println("************变量表**********");
+            for (Token token:tokenList){
+                if (token.getIndex()!=-1&&!keyTemp.containsValue(token.getSymbol())){
+                    System.out.println(token.getSymbol()+" "+token.getIndex());
+                    keyTemp.put(token,token.getSymbol());
+                }
+            }
+            System.out.println("************变量表**********");
+            for (Token token:tokenList){
+                if (token.getTokenKind().no!=28){
+                    System.out.format("%s\t\t%d\n",token.getSymbol(),token.getTokenKind().no);
+                }
+
             }
 
             //语法分析器
-            Parser parser = new Parser(tokenList);
-            parser.parse();
-            System.out.println("正确");
+//            Parser parser = new Parser(tokenList);
+//            parser.parse();
+//            System.out.println("正确");
 
         } catch (IOException e) {
             e.printStackTrace();
