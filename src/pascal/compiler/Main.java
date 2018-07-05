@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
+ * 语法分析
+ * 1500310210 蔡嘉盛
  */
 public class Main {
 
@@ -38,17 +40,19 @@ public class Main {
             tokenWriter.flush();
             //输出错误信息
             if (!success){
+                System.out.println("词法错误");
                 String errFile = "code.err";
                 errWriter = new FileWriter(errFile);
                 errWriter.flush();
                 for (TextLex.Error error:errorList){
                     errWriter.write("line"+error.getLine()+":"+error.getMsg()+"\n");
                     System.out.println("line"+error.getLine()+":"+error.getMsg());
+                    System.exit(0);
                 }
             }else{
                 System.out.println("没有错误");
             }
-            Map<Token,String> keyTemp=new HashMap<>();
+            /*Map<Token,String> keyTemp=new HashMap<>();
             System.out.println("************变量表**********");
             for (Token token:tokenList){
                 if (token.getIndex()!=-1&&!keyTemp.containsValue(token.getSymbol())){
@@ -62,13 +66,12 @@ public class Main {
                     System.out.format("%s\t\t%d\n",token.getSymbol(),token.getTokenKind().no);
                 }
 
-            }
+            }*/
 
             //语法分析器
-//            Parser parser = new Parser(tokenList);
-//            parser.parse();
-//            System.out.println("正确");
-
+            Parser parser = new Parser(tokenList);
+            parser.parse();
+            System.out.println("语法正确");
         } catch (IOException e) {
             e.printStackTrace();
         }finally {

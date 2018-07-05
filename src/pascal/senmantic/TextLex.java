@@ -204,7 +204,7 @@ public class TextLex {
                 tokenList.add(new Token(s, Token.TokenKind.IDENTIFIER, Integer.parseInt(identifierList.get(s))));
                 return i;
         }
-        if (ch != ' ' && ch != '\n' && ch != '\t' && ch != '\r' && ch != ';' && ch != '{') {
+        if (ch != ' ' && ch != '\n' && ch != '\t' && ch != '\r' && ch != ';' && ch != '{'&& ch != '.') {
             error(ch + "关键字后不能有字符");
         }
         return i;

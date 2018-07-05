@@ -6,14 +6,14 @@ import java.io.File;
 import java.io.IOException;
 public class PicToAscii {
     //private static final char[] defaultChar=new String("MNHQ$OC?7>!:-;.").toCharArray();
-    private static final char[] defaultChar=new String(".;-:!>7?CO$QHNM").toCharArray();//黑白反转
+    private static final char[] defaultChar=new String(".,'^~-ocvxnzt+hysk!lpgea*%$wm&#@").toCharArray();//黑白反转
     //设置获取灰度的方格大小 需要设置为矩形，因为字符的大小为矩形
     private static final int NX=2;
     private static final int NY=4;
 
     public static void main(String[] args){
         //输入一张图片
-        String image= transform("image/suolon3.png");
+        String image= transform("image/solon4.jpg");
         System.out.println(image);
 
     }
@@ -25,7 +25,7 @@ public class PicToAscii {
         for (int y = 0; y < image.getHeight()-NY; y+=NY) {
             for (int x = 0; x < image.getWidth()-NX; x+=NX) {
                 int gray=avgGray(x,y,image);
-                int num=(int)Math.floor(gray/18);//  256/18=14个灰度等级
+                int num=(int)Math.floor(gray/8);//  256/18=14个灰度等级
                 stringBuffer.append(defaultChar[num]);
             }
             stringBuffer.append("\n\r");
